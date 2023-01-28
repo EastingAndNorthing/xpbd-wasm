@@ -4,9 +4,11 @@ Physics solver built with AssemblyScript. Based on Extended Position Based Dynam
 For a working implementation of XPBD featuring TypeScript and THREE.js, see https://github.com/EastingAndNorthing/three 
 
 ## Development
-Develop and run testing suite: `npm run watch`
+`npm install` - Install dependencies
 
-Build: `npm run build`
+`npm run watch` - Runs the development testing suite
+
+`npm run build` - Build the project
 
 ## Notes
 https://www.assemblyscript.org/built-with-assemblyscript.html

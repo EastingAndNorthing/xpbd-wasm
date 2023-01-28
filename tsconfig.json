@@ -1,0 +1,9 @@
+{
+  "extends": "assemblyscript/std/assembly.json",
+  "compilerOptions": {
+    "types": ["@as-pect/assembly/types/as-pect", "assemblyscript/std/types/assembly"]
+  },
+  "include": [
+    "./**/*.ts"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "devDependencies": {
+    "@as-pect/cli": "^8.0.1",
+    "assemblyscript": "^0.25.2",
+    "npm-watch": "^0.11.0"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./build/release.js",
+      "types": "./build/release.d.ts"
+    }
+  },
+  "scripts": {
+    "asbuild:debug": "asc src/index.ts --target debug",
+    "asbuild:release": "asc src/index.ts --target release",
+    "asbuild": "npm run asbuild:debug && npm run asbuild:release",
+    "build": "npm run asbuild",
+    "test": "asp --no-logo",
+    "watch": "npm-watch test"
+  },
+  "watch": {
+    "test": {
+      "patterns": ["src"],
+      "extensions": "ts"
+    }
+  }
+}

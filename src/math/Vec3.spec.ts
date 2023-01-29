@@ -36,6 +36,22 @@ describe('Vec3', () => {
         expect(c.z).toBe(-2 * z);
     });
 
+    test('sub', () => {
+        const a = new Vec3(x, y, z);
+        const b = new Vec3(-x, -y, -z);
+
+        a.sub(b);
+        expect(a.x).toBe(2 * x);
+        expect(a.y).toBe(2 * y);
+        expect(a.z).toBe(2 * z);
+
+        const c = new Vec3();
+        c.subVectors(a, a);
+        expect(c.x).toBe(0);
+        expect(c.y).toBe(0);
+        expect(c.z).toBe(0);
+    });
+
     /* Multiplication */
 
     test('multiplyScalar', () => {

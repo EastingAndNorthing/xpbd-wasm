@@ -3,9 +3,11 @@ import { Quat } from './Quat';
 // https://github.com/lume/glas/blob/main/src/as/math/Vector3.ts
 export class Vec3 {
 
-    public x: f32 = 0; // @TODO f64 option at some point?
+    public x: f32 = 0;
     public y: f32 = 0;
     public z: f32 = 0;
+
+    // private lane: v128 = f32x4.splat(0);
 
     constructor(x: f32 = 0, y: f32 = 0, z: f32 = 0) {
         this.set(x, y, z);
@@ -34,9 +36,14 @@ export class Vec3 {
     /* Addition and subtraction */
 
     add(a: Vec3): this {
-        this.x += a.x;
-        this.y += a.y;
-        this.z += a.z;
+        // this.x += a.x;
+        // this.y += a.y;
+        // this.z += a.z;
+
+        const l1 = f32x4(this.x, this.y, this.z, 0);
+        const l2 = f32x4(a.x, a.y, a.z, 0);
+        const res = f32x4.add(l1, l2);
+        this._extract(res);
 
         return this;
     }
@@ -52,25 +59,40 @@ export class Vec3 {
     // }
 
     sub(a: Vec3): this {
-        this.x -= a.x;
-        this.y -= a.y;
-        this.z -= a.z;
+        // this.x -= a.x;
+        // this.y -= a.y;
+        // this.z -= a.z;
+
+        const l1 = f32x4(this.x, this.y, this.z, 0);
+        const l2 = f32x4(a.x, a.y, a.z, 0);
+        const res = f32x4.sub(l1, l2);
+        this._extract(res);
 
         return this;
     }
 
     addVectors(a: Vec3, b: Vec3): this {
-        this.x = a.x + b.x;
-        this.y = a.y + b.y;
-        this.z = a.z + b.z;
+        // this.x = a.x + b.x;
+        // this.y = a.y + b.y;
+        // this.z = a.z + b.z;
+
+        const l1 = f32x4(a.x, a.y, a.z, 0);
+        const l2 = f32x4(b.x, b.y, b.z, 0);
+        const res = f32x4.add(l1, l2);
+        this._extract(res);
 
         return this;
     }
 
     subVectors(a: Vec3, b: Vec3): this {
-        this.x = a.x - b.x;
-        this.y = a.y - b.y;
-        this.z = a.z - b.z;
+        // this.x = a.x - b.x;
+        // this.y = a.y - b.y;
+        // this.z = a.z - b.z;
+
+        const l1 = f32x4(a.x, a.y, a.z, 0);
+        const l2 = f32x4(b.x, b.y, b.z, 0);
+        const res = f32x4.sub(l1, l2);
+        this._extract(res);
 
         return this;
     }
@@ -87,17 +109,27 @@ export class Vec3 {
     /* Multiplication */
 
     multiply(v: Vec3): this {
-        this.x *= v.x;
-        this.y *= v.y;
-        this.z *= v.z;
+        // this.x *= v.x;
+        // this.y *= v.y;
+        // this.z *= v.z;
+
+        const l1 = f32x4(this.x, this.y, this.z, 0);
+        const l2 = f32x4(v.x, v.y, v.z, 0);
+        const res = f32x4.mul(l1, l2);
+        this._extract(res);
 
         return this;
     }
 
     multiplyScalar(scalar: f32): this {
-        this.x *= scalar;
-        this.y *= scalar;
-        this.z *= scalar;
+        // this.x *= scalar;
+        // this.y *= scalar;
+        // this.z *= scalar;
+
+        const l1 = f32x4(this.x, this.y, this.z, 0);
+        const l2 = f32x4.splat(scalar);
+        const res = f32x4.mul(l1, l2);
+        this._extract(res);
 
         return this;
     }
@@ -109,7 +141,13 @@ export class Vec3 {
     /* Vector math (self) */
 
     lengthSq(): f32 {
-        return this.x * this.x + this.y * this.y + this.z * this.z;
+        // return (this.x * this.x) + (this.y * this.y) + (this.z * this.z);
+
+        const l1 = f32x4(this.x, this.y, this.z, 0);
+        const l2 = f32x4(this.x, this.y, this.z, 0);
+        const res = f32x4.mul(l1, l2);
+        
+        return this._sum(res);
     }
 
     length(): f32 {
@@ -117,13 +155,14 @@ export class Vec3 {
     }
 
     normalize(): this {
+        // @TODO use EPS
         return this.divideScalar(this.length() || 1);
     }
 
     /* Vector math (other vectors) */
 
     dot(v: Vec3): f32 {
-        return this.x * v.x + this.y * v.y + this.z * v.z;
+        return (this.x * v.x) + (this.y * v.y) + (this.z * v.z);
     }
 
     cross(a: Vec3): this {
@@ -158,7 +197,8 @@ export class Vec3 {
     }
 
     /* Quaternions */
-
+    
+    // @inline
     applyQuaternion(q: Quat): this {
         var x = this.x,
             y = this.y,
@@ -214,5 +254,21 @@ export class Vec3 {
 
     static dot(v1: Vec3, v2: Vec3): f32 {
         return v1.dot(v2);
+    }
+
+    @inline
+    _sum(lane: v128): f32 {
+        return (
+            f32x4.extract_lane(lane, 0) + 
+            f32x4.extract_lane(lane, 1) + 
+            f32x4.extract_lane(lane, 2)
+        )
+    }
+    
+    @inline
+    _extract(lane: v128): void {
+        this.x = f32x4.extract_lane(lane, 0);
+        this.y = f32x4.extract_lane(lane, 1);
+        this.z = f32x4.extract_lane(lane, 2);
     }
 }

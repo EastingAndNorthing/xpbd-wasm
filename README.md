@@ -14,6 +14,10 @@ For a working implementation of XPBD featuring TypeScript and THREE.js, see http
 https://www.assemblyscript.org/built-with-assemblyscript.html
 https://github.com/lume/glas
 
+- SIMD: 
+    - https://github.com/WebAssembly/simd/blob/main/proposals/simd/SIMD.md
+    - `ASC_FEATURE_SIMD` 
+
 ### Memory / GC
 https://github.com/WebAssembly/gc
 https://github.com/AssemblyScript/assemblyscript/issues/230

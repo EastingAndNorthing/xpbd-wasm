@@ -55,7 +55,7 @@ export function benchVec3(count: i32 = 100): boolean {
 export function benchVec3SIMD(count: i32 = 100): boolean {
     const v = new Vec3SIMD(1, 2, 3);
     const v2 = new Vec3SIMD(1, 2, 1);
-    const q2 = new Quat(1, 2, 3, 1).normalize();
+    const q2 = new QuatSIMD(1, 2, 3, 1).normalize();
 
     const result: Array<f32> = [];
 

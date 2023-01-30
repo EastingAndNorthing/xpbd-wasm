@@ -1,4 +1,4 @@
-import { Quat } from './Quat';
+import { Quat } from './Quat.simd';
 
 // https://github.com/lume/glas/blob/main/src/as/math/Vector3.ts
 export class Vec3 {

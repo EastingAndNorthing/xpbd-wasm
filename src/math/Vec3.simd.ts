@@ -12,7 +12,7 @@ export class Vec3 {
     constructor(x: f32 = 0, y: f32 = 0, z: f32 = 0) {
         this.set(x, y, z);
     }
-
+    
     static create(): Vec3 {
         return new Vec3();
     }
@@ -42,46 +42,40 @@ export class Vec3 {
 
     @inline
     add(a: Vec3): this {
-        this.x += a.x;
-        this.y += a.y;
-        this.z += a.z;
+        const l1 = f32x4(this.x, this.y, this.z, 0);
+        const l2 = f32x4(a.x, a.y, a.z, 0);
+        const res = f32x4.add(l1, l2);
+        this._extract(res);
 
         return this;
     }
 
-    // @TODO implement operator overloading
-    // @operator('+')
-    // __op(other: Vec3): Vec3  {
-    //     return new Vec3(
-    //         this.x + other.x,
-    //         this.y + other.y,
-    //         this.z + other.z
-    //     )
-    // }
-
     @inline
     sub(a: Vec3): this {
-        this.x -= a.x;
-        this.y -= a.y;
-        this.z -= a.z;
+        const l1 = f32x4(this.x, this.y, this.z, 0);
+        const l2 = f32x4(a.x, a.y, a.z, 0);
+        const res = f32x4.sub(l1, l2);
+        this._extract(res);
 
         return this;
     }
 
     @inline
     addVectors(a: Vec3, b: Vec3): this {
-        this.x = a.x + b.x;
-        this.y = a.y + b.y;
-        this.z = a.z + b.z;
+        const l1 = f32x4(a.x, a.y, a.z, 0);
+        const l2 = f32x4(b.x, b.y, b.z, 0);
+        const res = f32x4.add(l1, l2);
+        this._extract(res);
 
         return this;
     }
 
     @inline
     subVectors(a: Vec3, b: Vec3): this {
-        this.x = a.x - b.x;
-        this.y = a.y - b.y;
-        this.z = a.z - b.z;
+        const l1 = f32x4(a.x, a.y, a.z, 0);
+        const l2 = f32x4(b.x, b.y, b.z, 0);
+        const res = f32x4.sub(l1, l2);
+        this._extract(res);
 
         return this;
     }
@@ -100,18 +94,20 @@ export class Vec3 {
 
     @inline
     multiply(v: Vec3): this {
-        this.x *= v.x;
-        this.y *= v.y;
-        this.z *= v.z;
+        const l1 = f32x4(this.x, this.y, this.z, 0);
+        const l2 = f32x4(v.x, v.y, v.z, 0);
+        const res = f32x4.mul(l1, l2);
+        this._extract(res);
 
         return this;
     }
 
     @inline
     multiplyScalar(scalar: f32): this {
-        this.x *= scalar;
-        this.y *= scalar;
-        this.z *= scalar;
+        const l1 = f32x4(this.x, this.y, this.z, 0);
+        const l2 = f32x4.splat(scalar);
+        const res = f32x4.mul(l1, l2);
+        this._extract(res);
 
         return this;
     }
@@ -125,7 +121,11 @@ export class Vec3 {
 
     @inline
     lengthSq(): f32 {
-        return (this.x * this.x) + (this.y * this.y) + (this.z * this.z);
+        const l1 = f32x4(this.x, this.y, this.z, 0);
+        const l2 = f32x4(this.x, this.y, this.z, 0);
+        const res = f32x4.mul(l1, l2);
+        
+        return this._sum(res);
     }
 
     @inline
@@ -160,9 +160,16 @@ export class Vec3 {
             by = b.y,
             bz = b.z;
 
-        this.x = ay * bz - az * by;
-        this.y = az * bx - ax * bz;
-        this.z = ax * by - ay * bx;
+        const l1 = f32x4(ay, az, az, ax);
+        const l2 = f32x4(bz, by, bx, bz);
+        const res = f32x4.mul(l1, l2);
+        this.x = f32x4.extract_lane(res, 0) - f32x4.extract_lane(res, 1);
+        this.y = f32x4.extract_lane(res, 2) - f32x4.extract_lane(res, 3);
+        
+        const l3 = f32x4(bx, 0, 0, by); // @TODO swizzle?
+        const res2 = f32x4.mul(l1, l3);
+        this.z = f32x4.extract_lane(res2, 3) - 
+                    f32x4.extract_lane(res2, 0);
 
         return this;
     }
@@ -183,52 +190,29 @@ export class Vec3 {
 
     /* Quaternions */
     
+    
     @inline
     applyQuaternion(q: Quat): this {
-        const x = this.x,
+        var x = this.x,
             y = this.y,
             z = this.z;
-        const qx = q.x,
+        var qx = q.x,
             qy = q.y,
             qz = q.z,
             qw = q.w;
 
         // calculate quat * vector
 
-        // const ix =  (qy * z) - (qz * y) + (qw * x);
-        // const iy =  (qw * y) + (qz * x) - (qx * z);
-        // const iz =  (qx * y) - (qy * x) + (qw * z);
-        // const iw = -(qx * x) - (qy * y) - (qz * z);
-
-        const lq = f32x4(qx, qy, qz, qw);
-
-        //              iy | ix ix ix
-        const l1 = f32x4(z, z, y, x);
-        const res1 = f32x4.mul(lq, l1);
-
-        //              iz iz | iy iy
-        const l2 = f32x4(y, x, x, y);  // @TODO swizzle?
-        const res2 = f32x4.mul(lq, l2);
-
-        //              iw iw iw | iz
-        const l3 = f32x4(-x, y, z, z);
-        const res3 = f32x4.mul(lq, l3);
-
-        const ix = f32x4.extract_lane(res1, 1) - f32x4.extract_lane(res1, 2) + f32x4.extract_lane(res1, 3);
-        const iy = f32x4.extract_lane(res2, 3) + f32x4.extract_lane(res2, 2) - f32x4.extract_lane(res1, 0);
-        const iz = f32x4.extract_lane(res2, 0) - f32x4.extract_lane(res2, 1) + f32x4.extract_lane(res3, 3);
-        const iw = f32x4.extract_lane(res3, 0) - f32x4.extract_lane(res3, 1) - f32x4.extract_lane(res3, 2);
-
-        // log("test");
-        // log(qx * z);
-        // log(f32x4.extract_lane(res1, 0))
+        var ix = qw * x + qy * z - qz * y;
+        var iy = qw * y + qz * x - qx * z;
+        var iz = qw * z + qx * y - qy * x;
+        var iw = -qx * x - qy * y - qz * z;
 
         // calculate result * inverse quat
-        // const lqinv = f32x4.neg(lq); // Inverse quat
 
-        this.x = (ix * qw) + (iw * -qx) + (iy * -qz) - (iz * -qy);
-        this.y = (iy * qw) + (iw * -qy) + (iz * -qx) - (ix * -qz);
-        this.z = (iz * qw) + (iw * -qz) + (ix * -qy) - (iy * -qx);
+        this.x = ix * qw + iw * -qx + iy * -qz - iz * -qy;
+        this.y = iy * qw + iw * -qy + iz * -qx - ix * -qz;
+        this.z = iz * qw + iw * -qz + ix * -qy - iy * -qx;
 
         return this;
     }

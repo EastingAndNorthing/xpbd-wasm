@@ -195,36 +195,10 @@ export class Vec3 {
 
         // calculate quat * vector
 
-        // const ix =  (qy * z) - (qz * y) + (qw * x);
-        // const iy =  (qw * y) + (qz * x) - (qx * z);
-        // const iz =  (qx * y) - (qy * x) + (qw * z);
-        // const iw = -(qx * x) - (qy * y) - (qz * z);
-
-        const lq = f32x4(qx, qy, qz, qw);
-
-        //              iy | ix ix ix
-        const l1 = f32x4(z, z, y, x);
-        const res1 = f32x4.mul(lq, l1);
-
-        //              iz iz | iy iy
-        const l2 = f32x4(y, x, x, y);  // @TODO swizzle?
-        const res2 = f32x4.mul(lq, l2);
-
-        //              iw iw iw | iz
-        const l3 = f32x4(-x, y, z, z);
-        const res3 = f32x4.mul(lq, l3);
-
-        const ix = f32x4.extract_lane(res1, 1) - f32x4.extract_lane(res1, 2) + f32x4.extract_lane(res1, 3);
-        const iy = f32x4.extract_lane(res2, 3) + f32x4.extract_lane(res2, 2) - f32x4.extract_lane(res1, 0);
-        const iz = f32x4.extract_lane(res2, 0) - f32x4.extract_lane(res2, 1) + f32x4.extract_lane(res3, 3);
-        const iw = f32x4.extract_lane(res3, 0) - f32x4.extract_lane(res3, 1) - f32x4.extract_lane(res3, 2);
-
-        // log("test");
-        // log(qx * z);
-        // log(f32x4.extract_lane(res1, 0))
-
-        // calculate result * inverse quat
-        // const lqinv = f32x4.neg(lq); // Inverse quat
+        const ix =  (qy * z) - (qz * y) + (qw * x);
+        const iy =  (qw * y) + (qz * x) - (qx * z);
+        const iz =  (qx * y) - (qy * x) + (qw * z);
+        const iw = -(qx * x) - (qy * y) - (qz * z);
 
         this.x = (ix * qw) + (iw * -qx) + (iy * -qz) - (iz * -qy);
         this.y = (iy * qw) + (iw * -qy) + (iz * -qx) - (ix * -qz);

@@ -1,5 +1,5 @@
-import { Vec3 } from './Vec3';
-import { Quat } from './Quat';
+import { Vec3 } from './Vec3.simd';
+import { Quat } from './Quat.simd';
 import { x, y, z, w, eps } from '../test-constants.spec';
 
 describe('Vec3', () => {

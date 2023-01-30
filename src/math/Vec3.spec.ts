@@ -60,6 +60,11 @@ describe('Vec3', () => {
         check(a, 2.5, 5, 7.5);
     });
 
+    test('multiply', () => {
+        const a = new Vec3(1, 2, 3);
+        check(a.multiply(new Vec3(2, 2, 2)), 2, 4, 6);
+    });
+
     test('mul', () => {
         const a = new Vec3(1, 2, 3);
         check(Vec3.mul(a, 2), 2, 4, 6);

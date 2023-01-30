@@ -1,4 +1,6 @@
 # XPBD physics solver in WebAssembly 🚀
+Note: work in progress ;)
+
 Physics solver built with AssemblyScript. Based on Extended Position Based Dynamics by [Matthias Müller](https://github.com/matthias-research).
 
 For a working implementation of XPBD featuring TypeScript and THREE.js, see https://github.com/EastingAndNorthing/three 

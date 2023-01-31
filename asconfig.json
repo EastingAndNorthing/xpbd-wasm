@@ -18,6 +18,7 @@
   },
   "options": {
     "bindings": "esm",
-    "enable": ["simd"]
+    "enable": ["simd"],
+    "exportRuntime": true
   }
 }

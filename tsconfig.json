@@ -1,9 +1,17 @@
 {
-  "extends": "assemblyscript/std/assembly.json",
   "compilerOptions": {
-    "types": ["@as-pect/assembly/types/as-pect", "assemblyscript/std/types/assembly"]
+    "target": "ESNext",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "paths": {
+      "@wasmFile": ["./dist/wasm/release.wasm"],
+      "wasm": ["./wasm"],
+      "src": ["./src"]
+    },
+    "outDir": "./dist",
+    "declaration": true,
+    // "noEmit": true
   },
-  "include": [
-    "./**/*.ts"
-  ]
+  "include": [],
+  "files": ["./src/index.ts"]
 }

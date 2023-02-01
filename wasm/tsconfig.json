@@ -1,0 +1,12 @@
+{
+  // "extends": "assemblyscript/std/assembly.json",
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": ["@as-pect/assembly/types/as-pect", "assemblyscript/std/types/assembly"],
+    "outDir": "./dist",
+    "experimentalDecorators": true,
+    "declaration": false,
+    "noEmit": true
+  },
+  "include": ["./**/*.ts"],
+}

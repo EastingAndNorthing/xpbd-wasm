@@ -1,10 +1,10 @@
 {
   "type": "module",
-  "types": "./build/release.d.ts",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./build/release.js",
-      "types": "./build/release.d.ts"
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     }
   },
   "devDependencies": {
@@ -13,17 +13,23 @@
     "npm-watch": "^0.11.0"
   },
   "scripts": {
-    "asbuild:debug": "asc src/index.ts --target debug",
-    "asbuild:release": "asc src/index.ts --target release",
+    "asbuild:debug": "asc wasm/index.ts --target debug",
+    "asbuild:release": "asc wasm/index.ts --target release",
     "asbuild": "npm run asbuild:debug && npm run asbuild:release",
+    "tsbuild": "tsc",
     "build": "npm run asbuild:release",
     "test": "asp --no-logo",
     "watch": "npm-watch test"
   },
   "watch": {
     "test": {
-      "patterns": ["src"],
+      "patterns": [
+        "wasm"
+      ],
       "extensions": "ts"
     }
+  },
+  "dependencies": {
+    "fs": "^0.0.1-security"
   }
 }

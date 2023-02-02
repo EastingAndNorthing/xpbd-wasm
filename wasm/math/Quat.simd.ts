@@ -86,6 +86,8 @@ export class Quat {
      * Returns the rotational conjugate of this quaternion. The conjugate of a
      * quaternion represents the same rotation in the opposite direction about the
      * rotational axis.
+     * 
+     * @TODO always store within this class? 
      */
     conjugate(): this {
         this.x *= -1;

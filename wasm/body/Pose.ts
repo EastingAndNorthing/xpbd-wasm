@@ -1,5 +1,5 @@
-import { Vec3 } from "../math/Vec3";
-import { Quat } from "../math/Quat";
+import { Vec3 } from "../math/Vec3.simd";
+import { Quat } from "../math/Quat.simd";
 
 export class Pose {
 

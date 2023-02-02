@@ -1,7 +1,7 @@
 import { Pose } from './Pose';
 import { x, y, z, w, eps } from '../test-constants.spec';
-import { Vec3 } from '../math/Vec3';
-import { Quat } from '../math/Quat';
+import { Vec3 } from '../math/Vec3.simd';
+import { Quat } from '../math/Quat.simd';
 
 describe('Pose', () => {
     test('Pose constructor', () => {

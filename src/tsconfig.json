@@ -1,6 +1,7 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
+    // "types": [ "assemblyscript/std/types/assembly" ],
     "outDir": "./dist",
     "declaration": true,
     "noEmit": false

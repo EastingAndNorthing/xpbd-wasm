@@ -13,12 +13,17 @@
       "optimizeLevel": 3,
       "shrinkLevel": 0,
       "converge": true,
-      "noAssert": true
+      "noAssert": true,
+      "debug": true
     }
   },
   "options": {
+    "runtime": "incremental",
+    "exportRuntime": true,
+    "pedantic": true,
     "bindings": "esm",
     "enable": ["simd"],
-    "exportRuntime": true
+    "stackSize": 16384,
+    "memoryBase": 4096
   }
 }

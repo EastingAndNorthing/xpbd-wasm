@@ -1,6 +1,6 @@
 import { Body } from './body/Body';
-import { Collider, ColliderType, MeshCollider, PlaneCollider } from './collider/Collider';
-import { QuatLike, Vec3Like, World } from './core/World';
+import { MeshCollider, PlaneCollider } from './collider/Collider';
+import { World } from './core/World';
 import { Vec3 } from './math/Vec3.simd';
 
 assert(ASC_FEATURE_SIMD, "Expected SIMD to be enabled");
@@ -15,6 +15,7 @@ export function addBox(
 
     world.addBody(
         new Body(
+            0,
             new MeshCollider().setGeometry(sizeX, sizeY, sizeZ)
         )
     );
@@ -23,8 +24,9 @@ export function addBox(
 export function addGround(): void {
     world.addBody(
         new Body(
+            1,
             new PlaneCollider(new Vec3(0, 1, 0))
-        )
+        ).setStatic()
     );
 }
 

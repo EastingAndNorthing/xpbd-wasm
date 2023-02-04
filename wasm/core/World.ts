@@ -1,20 +1,6 @@
 import { Body } from '../body/Body';
-import { Quat } from '../math/Quat.simd';
 import { Vec3 } from '../math/Vec3.simd';
-// import { XPBDSolver } from './XPBDSolver';
-
-export class Vec3Like {
-    x: f32; 
-    y: f32; 
-    z: f32;
-}
-
-export class QuatLike {
-    x: f32; 
-    y: f32; 
-    z: f32;
-    w: f32;
-}
+import { XPBDSolver } from './XPBDSolver';
 
 /**
  * WebAssembly World
@@ -22,19 +8,23 @@ export class QuatLike {
 export class World {
 
     public bodies: Array<Body> = [];
-    private bodyIdx: u32 = u32(0);
-    private bodyMemSize: u32 = u32(7);
+    // private bodyIdx: u32 = u32(0);
+    // private bodyMemSize: u32 = u32(7);
+
+    static bodyPtr: usize = 10;
     
-    // private solver: XPBDSolver;
+    private solver: XPBDSolver;
 
     constructor() {
-        // this.solver = new XPBDSolver();
-        // store<f32>(sizeof<f32>() * 10, 100);
+        this.solver = new XPBDSolver();
     }
     
     addBody(
         body: Body, 
     ): void {
+        // body.id = this.bodies.length;
+        body.setID(this.bodies.length);
+
         this.bodies.push(body);
 
         /**
@@ -50,12 +40,13 @@ export class World {
         // store<f32>(offset + sizeof<f32>() * 5, quaternion.z);
         // store<f32>(offset + sizeof<f32>() * 6, quaternion.w);
 
-        this.bodyIdx++;
+        // this.bodyIdx++;
     }
 
     update(dt: f32): void {
-        // store<f32>(sizeof<f32>() * 20, 101);
-        // this.solver.update(this.bodies, [], dt, new Vec3(0, -10, 0));
+        // store<f32>(sizeof<f32>() * 20, 100);
+
+        this.solver.update(this.bodies, [], dt, new Vec3(0, -10, 0));
     }
     
 }

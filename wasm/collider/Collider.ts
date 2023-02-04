@@ -13,8 +13,8 @@ export class Collider {
     colliderType: ColliderType = ColliderType.Plane;
 
     vertices: Array<Vec3> = [];
-    indices: Array<number> = [];
-    uniqueIndices: Array<number> = [];
+    indices: Array<i8> = [];
+    uniqueIndices: Array<i8> = [];
 
     public updateRotation(q: Quat): void {
         // console.log('updateRotation not implemented')
@@ -40,7 +40,7 @@ export class PlaneCollider extends Collider {
     }
 
     override updateRotation(q: Quat): void {
-        this.normalRef.applyQuaternion(q);
+        // this.normalRef.applyQuaternion(q);
     }
 };
 

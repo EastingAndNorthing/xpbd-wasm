@@ -8,56 +8,56 @@ export class ContactSet {
 
     // plane: Plane;
 
-    lambda: number = 0;     //  λ   - lambda
-    lambda_n: number = 0;   //  λn  - lambda N (normal)
-    lambda_t: number = 0;   //  λn  - lambda T (tangential)
+    lambda: f32 = 0;     //  λ   - lambda
+    lambda_n: f32 = 0;   //  λn  - lambda N (normal)
+    lambda_t: f32 = 0;   //  λn  - lambda T (tangential)
 
     /**
      * Contact point (world, on A)
      */
-    p1 = new Vec3(0.0, 0.0, 0.0);
+    p1: Vec3 = new Vec3(0.0, 0.0, 0.0);
 
     /**
      * Contact point (world, on B)
      */
-    p2 = new Vec3(0.0, 0.0, 0.0);
+    p2: Vec3 = new Vec3(0.0, 0.0, 0.0);
 
     /**
      * Contact point (local on A)
      */
-    r1 = new Vec3(0.0, 0.0, 0.0);
+    r1: Vec3 = new Vec3(0.0, 0.0, 0.0);
 
     /**
      * Contact point (local on B)
      */
-    r2 = new Vec3(0.0, 0.0, 0.0);
+    r2: Vec3 = new Vec3(0.0, 0.0, 0.0);
 
     /**
      * Contact normal
      */
-    n = new Vec3(0.0, 0.0, 0.0);
+    n: Vec3 = new Vec3(0.0, 0.0, 0.0);
 
     /**
      * Penetration depth
      */
-    d: number = 0.0;
+    d: f32 = 0.0;
 
     /**
      * Relative velocity
      */
-    vrel = new Vec3(0.0, 0.0, 0.0);
+    vrel: Vec3 = new Vec3(0.0, 0.0, 0.0);
 
     /**
      * Normal velocity
      */
-    vn: number = 0;
+    vn: f32 = 0;
 
-    e: number = 0; // Coefficient of restitution
+    e: f32 = 0; // Coefficient of restitution
 
-    friction: number = 0;
+    friction: f32 = 0;
 
     F: Vec3 = new Vec3(0, 0, 0); // Current constraint force
-    Fn: number = 0; // Current constraint force (normal direction) == -contact.lambda_n / (h * h);
+    Fn: f32 = 0; // Current constraint force (normal direction) == -contact.lambda_n / (h * h);
 
     constructor(A: Body, B: Body, normal: Vec3) {
         if (A === B || A.id == B.id)

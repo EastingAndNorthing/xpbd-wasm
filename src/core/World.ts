@@ -27,11 +27,8 @@ export class World {
 
         // @TODO add some nice glue here
         const addBox = this.wasm.addBox as typeof WASM.addBox;
-        const addGround = this.wasm.addGround as typeof WASM.addGround;
 
-        addBox(sizeX, sizeY, sizeZ);
-        addGround();
-
+        // Memory must be set before calling addBox()
         this.writeMemory(this.bodyIdx, [
             Object3D.position.x,
             Object3D.position.y,
@@ -42,14 +39,33 @@ export class World {
             Object3D.quaternion.w,
         ])
 
+        addBox(sizeX, sizeY, sizeZ);
+
         Object3D.userData.physicsBody = this.bodyIdx;
 
         this.bodyIdx++;
     }
 
+    addGround() {
+        // Memory must be set before calling addBox()
+        this.writeMemory(this.bodyIdx, [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+        ])
+        
+        const addGround = this.wasm.addGround as typeof WASM.addGround;
+
+        addGround();
+    }
+
     public update(dt: number) {
-        // const update = this.wasm.update as typeof WASM.update;
-        // update(dt);
+        const update = this.wasm.update as typeof WASM.update;
+        update(dt);
 
         this.syncState();
         
@@ -59,7 +75,7 @@ export class World {
         for (let i = 0; i < this.objects.length; i++) {
             const obj = this.objects[i];
 
-            const ptr = i * this.bodyMemSize;
+            const ptr = this.getBodyAddress(i);
 
             obj.position.x   = this.f32arr[ptr + 0];
             obj.position.y   = this.f32arr[ptr + 1];
@@ -71,12 +87,19 @@ export class World {
         }
     }
 
-    private writeMemory(ptr: number, values: Array<number>) {
+    private writeMemory(id: number, values: Array<number>) {
+        // @TODO get body address offset from WASM
+        const ptr = this.getBodyAddress(id);
+
         for (let i = 0; i < values.length; i++) {
             this.f32arr[ptr + i] = values[i];
         }
 
         console.log(this.f32arr);
+    }
+
+    private getBodyAddress(id: number) {
+        return 10 + id * this.bodyMemSize;
     }
 
 }

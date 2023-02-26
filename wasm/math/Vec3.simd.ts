@@ -139,6 +139,11 @@ export class Vec3 {
         return this.divideScalar(this.length() || 1);
     }
 
+    @inline
+    negate(): this {
+        return this.multiplyScalar(-1.0);
+    }
+
     /* Vector math (other vectors) */
 
     @inline

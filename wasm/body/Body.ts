@@ -222,6 +222,22 @@ export class Body {
         this.updateCollider();
     }
 
+    @inline
+    public localToWorld(v: Vec3): Vec3 {
+        return new Vec3()
+            .copy(v)
+            .applyQuaternion(this.pose.q)
+            .add(this.pose.p);
+    }
+
+    @inline
+    public worldToLocal(v: Vec3): Vec3 {
+        return new Vec3()
+            .copy(v)
+            .sub(this.pose.p)
+            .applyQuaternion(this.pose.q.clone().conjugate())
+    }
+
     // @TODO move to XPBD browser/client side
     // public applyForceW(force: Vec3, worldPos: Vec3 = new Vec3(0,0,0)) {
     //     const F = force.clone();
@@ -232,7 +248,7 @@ export class Body {
 
     @inline
     public updateCollider(): void {
-        this.collider.updateRotation(this.pose.q);
+        this.collider.updateGlobalPose(this.pose);
     }
 
     @inline

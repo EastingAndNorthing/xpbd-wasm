@@ -1,3 +1,4 @@
+import { Pose } from "../body/Pose";
 import { Quat } from "../math/Quat.simd";
 import { Vec3 } from "../math/Vec3.simd";
 
@@ -13,11 +14,18 @@ export class Collider {
     colliderType: ColliderType = ColliderType.Plane;
 
     vertices: Array<Vec3> = [];
+    verticesWorldSpace: Array<Vec3> = [];
+
     indices: Array<i8> = [];
     uniqueIndices: Array<i8> = [];
 
-    public updateRotation(q: Quat): void {
+    public updateGlobalPose(pose: Pose): void {
         // console.log('updateRotation not implemented')
+    }
+
+    /* GJK */
+    public findFurthestPoint(dir: Vec3): Vec3 {
+        return new Vec3();
     }
 
 };
@@ -39,9 +47,9 @@ export class PlaneCollider extends Collider {
         // this.plane = new Plane(normal);
     }
 
-    override updateRotation(q: Quat): void {
-        // this.normalRef.applyQuaternion(q);
-    }
+    // override updateRotation(q: Quat): void {
+    //     // this.normalRef.applyQuaternion(q);
+    // }
 };
 
 export class MeshCollider extends Collider {
@@ -74,6 +82,10 @@ export class MeshCollider extends Collider {
                 new Vec3(-width/2, -height/2, -depth/2 ),
             ];
 
+            for (let i = 0; i < this.vertices.length; i++) {
+                unchecked(this.verticesWorldSpace[i] = this.vertices[i].clone());
+            }
+
             this.indices = [ 0, 1, 2, 3, 4, 5, 6, 7 ];
             this.uniqueIndices = [ 0, 1, 2, 3, 4, 5, 6, 7 ];
         // }
@@ -101,5 +113,38 @@ export class MeshCollider extends Collider {
         // }
 
         return this;
+    }
+
+
+    public override updateGlobalPose(pose: Pose): void {
+
+        for (let i = 0; i < this.vertices.length; i++) {
+            const v = this.vertices[i];
+
+            this.verticesWorldSpace[i]
+                .copy(v)
+                .applyQuaternion(pose.q)
+                .add(pose.p);
+
+        }
+    }
+
+    /* GJK */
+    public override findFurthestPoint(dir: Vec3): Vec3 {
+        
+        const maxPoint = new Vec3();
+        let maxDist = -Infinity;
+    
+        for (let i = 0; i < this.verticesWorldSpace.length; i++) {
+            const vertex = this.verticesWorldSpace[i];
+            const distance = vertex.dot(dir);
+
+            if (distance > maxDist) {
+                maxDist = distance;
+                maxPoint.copy(vertex);
+            }
+        }
+    
+        return maxPoint;
     }
 };

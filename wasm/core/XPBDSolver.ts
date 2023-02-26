@@ -1,14 +1,16 @@
 import { CollisionPair } from "../collision/CollisionPair";
 import { ContactSet } from "../collision/ContactSet";
-import { CoordinateSystem } from "../math/CoordinateSystem";
 import { ColliderType, MeshCollider, PlaneCollider } from "../collider/Collider";
 import { Body } from '../body/Body';
 import { Vec3 } from "../math/Vec3.simd";
+import { GjkEpa } from "../gjk-epa/GjkEpa";
 
 export class XPBDSolver {
 
     static numSubsteps: i8 = 20;
     static h: f32 = 0.000833333333; //(1 / 60) / XPBDSolver.numSubsteps;
+
+    // private narrowPhase: GjkEpa = new GjkEpa();
 
     public update(bodies: Array<Body>, constraints: Array<u8>, dt: f32, gravity: Vec3): void {
 
@@ -33,7 +35,7 @@ export class XPBDSolver {
             const contacts = this.getContacts(collisions);
 
             for (let j = 0; j < bodies.length; j++)
-                unchecked(bodies[j].integrate(h, gravity));
+                bodies[j].integrate(h, gravity);
 
             // for (let j = 0; j < constraints.length; j++)
             //     constraints[j].solvePos(h);
@@ -41,7 +43,7 @@ export class XPBDSolver {
             this.solvePositions(contacts, h);
 
             for (let j = 0; j < bodies.length; j++)
-                unchecked(bodies[j].update(h));
+                bodies[j].update(h);
 
             // for (let j = 0; j < constraints.length; j++)
             //     constraints[j].solveVel(h);
@@ -50,10 +52,10 @@ export class XPBDSolver {
         }
 
         for (let i = 0; i < bodies.length; i++) {
-            unchecked(bodies[i].force.set(0, 0, 0));
-            unchecked(bodies[i].torque.set(0, 0, 0));
+            bodies[i].force.set(0, 0, 0);
+            bodies[i].torque.set(0, 0, 0);
 
-            unchecked(bodies[i].writeMemory());
+            bodies[i].writeMemory();
         }
     }
 
@@ -95,9 +97,10 @@ export class XPBDSolver {
 
                                 // This should be a simple AABB check instead of actual loop over all vertices
                                 for(let i = 0; i < MC.uniqueIndices.length; i++) {
-                                    const v: Vec3 = unchecked(MC.vertices[MC.uniqueIndices[i]]);
+                                    const v: Vec3 = MC.vertices[MC.uniqueIndices[i]];
 
-                                    const contactPointW = CoordinateSystem.localToWorld(v, A.pose.q, A.pose.p);
+                                    // const contactPointW = CoordinateSystem.localToWorld(v, A.pose.q, A.pose.p);
+                                    const contactPointW = A.localToWorld(v);
                                     const signedDistance = contactPointW.clone().sub(B.pose.p).dot(PC.normal);
                                     // const signedDistance = PC.plane.distanceToPoint(contactPointW);
 
@@ -155,17 +158,17 @@ export class XPBDSolver {
         // @TODO check if vertex is actually inside plane size :)
         // @TODO maybe check if all vertices are in front of the plane first (skip otherwise)
         for(let i = 0; i < MC.uniqueIndices.length; i++) {
-            const v = unchecked(MC.vertices[MC.uniqueIndices[i]]);
 
             /* (26) - p1 */
-            const r1 = v;
-            const p1 = CoordinateSystem.localToWorld(v, A.pose.q, A.pose.p);
+            const r1 = unchecked(MC.vertices[MC.uniqueIndices[i]]);;
+            const p1 = unchecked(MC.verticesWorldSpace[MC.uniqueIndices[i]]);
 
             /* (26) - p2 */
             // const signedDistance = PC.plane.distanceToPoint(contactPointW);
             const signedDistance = Vec3.dot(N, Vec3.sub(p1, B.pose.p));
             const p2 = Vec3.sub(p1, Vec3.mul(N, signedDistance));
-            const r2 = CoordinateSystem.worldToLocal(p2, B.pose.q, B.pose.p);
+            // const r2 = CoordinateSystem.worldToLocal(p2, B.pose.q, B.pose.p);
+            const r2 = B.worldToLocal(p2);
 
             /* (3.5) Penetration depth -- Note: sign was flipped! */
             // const d = - N.dot(Vec3.sub(p1, p2));
